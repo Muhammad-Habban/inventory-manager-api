@@ -26,19 +26,38 @@ const createProductHistory = async (req, res) => {
   const date = new Date().toLocaleDateString();
   console.log(date);
   const prod = await History.findOne({ product: productID });
+  console.log(prod);
   if (prod) {
+    console.log("inside first if");
     if (prod.soldDate === date) {
-      prod.soldQuantity += soldQuantity;
-      await prod.save();
-      res.status(StatusCodes.OK).json({ prod, message: "Product updated" });
+      console.log("inside second if");
+      // prod.soldQuantity += soldQuantity;
+      // await prod.save();
+      res.status(StatusCodes.OK).json({ productExist: true, message: "Product already exist" });
     }
   }
+  console.log("outside if");
   const prodHistory = await History.create({
     soldDate: date,
     soldQuantity,
     product: productID,
   });
-  res.status(StatusCodes.OK).json(prodHistory);
+  res.status(StatusCodes.OK).json({prodHistory, message: "Product successfully created"});
 };
 
-module.exports = { getProductsHistory, createProductHistory };
+const updateProductHistory = async (req,res) => {
+  const { soldQuantity, productID } = req.body;
+  if (!soldQuantity || !productID) {
+    res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "Please enter all values" });
+  }
+  const prod = await History.findOne({ product: productID });
+  prod.soldQuantity += soldQuantity;
+  await prod.save();
+  res.status(StatusCodes.OK).json({ prod, message: "Product updated" });
+}
+
+
+
+module.exports = { getProductsHistory, createProductHistory, updateProductHistory };
