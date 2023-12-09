@@ -27,14 +27,24 @@ const createProductHistory = async (req, res) => {
 
   const date = new Date().toLocaleDateString();
   console.log("Created Date : " + date);
-  const prod = await History.findOne({ product: productID });
-  if (prod && prod.soldDate === date) {
-    console.log("product date : " + prod.soldDate);
-    prod.soldQuantity += soldQuantity;
-    await prod.save();
-    console.log(prod);
+  const prod = await History.find({ product: productID });
+  console.log("array : " + prod);
+  let findProduct = null;
+  if (prod.length > 0) {
+    findProduct = prod.filter((p) => {
+      return p.soldDate === date;
+    })[0];
+  }
+  console.log(findProduct);
+  if (findProduct) {
+    console.log("product date : " + findProduct.soldDate);
+    findProduct.soldQuantity += soldQuantity;
+    await findProduct.save();
+    console.log(findProduct);
     // res.status(StatusCodes.OK).json({ productExist: true, message: "Product already exist" });
-    res.status(StatusCodes.OK).json({ prod, message: "Product Updated" });
+    res
+      .status(StatusCodes.OK)
+      .json({ findProduct, message: "Product Updated" });
   } else {
     console.log("inside else ");
     const prodHistory = await History.create({
