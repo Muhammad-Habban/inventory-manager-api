@@ -60,6 +60,7 @@ const updateProduct = async (req, res) => {
 };
 
 const deleteProduct = async (req, res) => {
+  console.log("hi");
   const { productID } = req.params;
   const product = await Product.findOneAndDelete({ _id: productID });
   if (!product) {

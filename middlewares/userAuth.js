@@ -19,15 +19,15 @@ const userAuthMiddleware = (req, res, next) => {
   //   res.status(StatusCodes.UNAUTHORIZED).json({ msg: "Token is not valid" });
   // }
   const authHeader = req.headers.authorization || req.headers.Authorization;
+  console.log("Auth header " + authHeader);
   if (!authHeader?.startsWith("Bearer "))
     return res.status(401).json({ message: "Unauthorized" });
 
   const token = authHeader.split(" ")[1];
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) return res.status(401).json({ message: "Unauthorized" });
-    const {userID, userName, userRole} = decoded;
-    req.user = {userID, userName, userRole};
-    console.log(decoded);
+    const { userID, userName, userRole } = decoded;
+    req.user = { userID, userName, userRole };
     next();
   });
 };
@@ -41,7 +41,7 @@ const userRoleAuth = (req, res, next) => {
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) return res.status(401).json({ message: "Unauthorized" });
     // req.user = decoded.userInfo;
-    if (decoded.userInfo.userRole !== "admin") {
+    if (decoded.userRole !== "admin") {
       throw new UnauthenticatedError("Only Admins can access this resource");
     }
     next();
