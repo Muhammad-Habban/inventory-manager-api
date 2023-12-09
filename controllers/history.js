@@ -28,36 +28,23 @@ const createProductHistory = async (req, res) => {
   const prod = await History.findOne({ product: productID });
   console.log(prod);
   if (prod) {
-    console.log("inside first if");
     if (prod.soldDate === date) {
-      console.log("inside second if");
-      // prod.soldQuantity += soldQuantity;
-      // await prod.save();
-      res.status(StatusCodes.OK).json({ productExist: true, message: "Product already exist" });
+      prod.soldQuantity += soldQuantity;
+      await prod.save();
+      console.log(prod);
+      // res.status(StatusCodes.OK).json({ productExist: true, message: "Product already exist" });
+      res.status(StatusCodes.OK).json({prod, message: "Product Updated"});
+
     }
+  }else
+  {
+    const prodHistory = await History.create({
+      soldDate: date,
+      soldQuantity,
+      product: productID,
+    });
+    res.status(StatusCodes.OK).json({prodHistory, message: "Product successfully created"});
   }
-  console.log("outside if");
-  const prodHistory = await History.create({
-    soldDate: date,
-    soldQuantity,
-    product: productID,
-  });
-  res.status(StatusCodes.OK).json({prodHistory, message: "Product successfully created"});
 };
 
-const updateProductHistory = async (req,res) => {
-  const { soldQuantity, productID } = req.body;
-  if (!soldQuantity || !productID) {
-    res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "Please enter all values" });
-  }
-  const prod = await History.findOne({ product: productID });
-  prod.soldQuantity += soldQuantity;
-  await prod.save();
-  res.status(StatusCodes.OK).json({ prod, message: "Product updated" });
-}
-
-
-
-module.exports = { getProductsHistory, createProductHistory, updateProductHistory };
+module.exports = { getProductsHistory, createProductHistory };
